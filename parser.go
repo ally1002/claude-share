@@ -250,6 +250,9 @@ func parseUserRow(row sessionRow, opts ParseOpts) *Message {
 
 	var rawStr string
 	if err := json.Unmarshal(api.Content, &rawStr); err == nil {
+		if strings.Contains(rawStr, "<command-name>") || strings.Contains(rawStr, "<local-command") || strings.Contains(rawStr, "<system-reminder>") {
+			return nil
+		}
 		msg.Blocks = []ContentBlock{{Type: "text", Text: rawStr}}
 		return msg
 	}
@@ -273,6 +276,9 @@ func parseUserRow(row sessionRow, opts ParseOpts) *Message {
 				IsError:   b.IsError,
 			})
 		case "text":
+			if strings.Contains(b.Text, "<command-name>") || strings.Contains(b.Text, "<local-command") || strings.Contains(b.Text, "<system-reminder>") {
+				continue
+			}
 			msg.Blocks = append(msg.Blocks, ContentBlock{Type: "text", Text: b.Text})
 		}
 	}
