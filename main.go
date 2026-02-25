@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -68,7 +69,13 @@ func cmdList(claudeDir string, args []string) {
 
 	sessions, err := ParseHistory(claudeDir)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		if errors.Is(err, os.ErrNotExist) {
+			historyPath := filepath.Join(claudeDir, "history.jsonl")
+			fmt.Fprintf(os.Stderr, "Error: Could not find Claude history at %s\n", historyPath)
+			fmt.Fprintln(os.Stderr, "Hint: Make sure you've used Claude Code at least once")
+		} else {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		}
 		os.Exit(1)
 	}
 
@@ -141,7 +148,9 @@ func cmdExport(claudeDir string, args []string) {
 
 	sessions, err := ParseHistory(claudeDir)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Warning: could not load session history: %v\n", err)
+		if !os.IsNotExist(err) {
+			fmt.Fprintf(os.Stderr, "Warning: could not load session history: %v\n", err)
+		}
 	}
 	meta := SessionMeta{SessionID: sessionID, MessageCount: len(messages)}
 	for _, s := range sessions {
