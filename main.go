@@ -22,6 +22,8 @@ func main() {
 		cmdList(claudeDir, os.Args[2:])
 	case "export":
 		cmdExport(claudeDir, os.Args[2:])
+	case "help", "--help", "-h":
+		printUsage()
 	default:
 		fmt.Fprintf(os.Stderr, "Unknown command: %s\n", os.Args[1])
 		printUsage()
