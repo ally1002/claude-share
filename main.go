@@ -12,24 +12,33 @@ import (
 var version = "dev"
 
 func main() {
-	if len(os.Args) < 2 {
+	showVersion := flag.Bool("version", false, "Show version")
+	flag.Usage = printUsage
+	flag.Parse()
+
+	if *showVersion {
+		fmt.Println(version)
+		return
+	}
+
+	if flag.NArg() < 1 {
 		printUsage()
 		os.Exit(1)
 	}
 
 	claudeDir := filepath.Join(os.Getenv("HOME"), ".claude")
 
-	switch os.Args[1] {
+	switch flag.Arg(0) {
 	case "list":
-		cmdList(claudeDir, os.Args[2:])
+		cmdList(claudeDir, flag.Args()[1:])
 	case "export":
-		cmdExport(claudeDir, os.Args[2:])
-	case "version", "--version":
+		cmdExport(claudeDir, flag.Args()[1:])
+	case "version":
 		fmt.Println(version)
-	case "help", "--help", "-h":
+	case "help":
 		printUsage()
 	default:
-		fmt.Fprintf(os.Stderr, "Unknown command: %s\n", os.Args[1])
+		fmt.Fprintf(os.Stderr, "Unknown command: %s\n", flag.Arg(0))
 		printUsage()
 		os.Exit(1)
 	}
@@ -37,8 +46,19 @@ func main() {
 
 func printUsage() {
 	fmt.Fprintln(os.Stderr, `Usage:
-  claude-share list [--project <filter>]
-  claude-share export <session-id> [-o <file>] [--include-tools] [--include-thinking]`)
+  claude-share [global options] command [command options]
+
+Global options:
+  --version    Show version
+  --help       Show this help
+
+Commands:
+  list         List all sessions
+  export       Export a session to HTML
+
+Examples:
+  claude-share list --project myproject
+  claude-share export abc123 -o output.html`)
 }
 
 func cmdList(claudeDir string, args []string) {
@@ -119,7 +139,10 @@ func cmdExport(claudeDir string, args []string) {
 		os.Exit(1)
 	}
 
-	sessions, _ := ParseHistory(claudeDir)
+	sessions, err := ParseHistory(claudeDir)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Warning: could not load session history: %v\n", err)
+	}
 	meta := SessionMeta{SessionID: sessionID, MessageCount: len(messages)}
 	for _, s := range sessions {
 		if s.ID == sessionID {
