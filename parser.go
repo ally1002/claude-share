@@ -216,7 +216,7 @@ func ParseSession(path string, opts ParseOpts) ([]Message, error) {
 	}
 	var all []seqMsg
 	for _, u := range userMsgs {
-		all = append(all, seqMsg{msg: u.msg, seq: u.seq})
+		all = append(all, seqMsg(u))
 	}
 	for _, id := range assistantIDs {
 		grp := assistantGroups[id]

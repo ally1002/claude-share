@@ -171,7 +171,7 @@ func highlightJSON(jsonStr string) string {
 }
 
 func jsonIndent(dst *bytes.Buffer, src []byte) error {
-	var v interface{}
+	var v any
 	if err := json.Unmarshal(src, &v); err != nil {
 		return err
 	}
