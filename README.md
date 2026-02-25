@@ -2,6 +2,9 @@
 
 Convert [Claude Code](https://docs.anthropic.com/en/docs/claude-code) conversation sessions into shareable, self-contained HTML files.
 
+<img width="1237" height="665" alt="image" src="https://github.com/user-attachments/assets/1093e892-337e-49c9-af68-792186427160" />
+
+
 ## Install
 
 ```bash
