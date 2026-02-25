@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+var version = "dev"
+
 func main() {
 	if len(os.Args) < 2 {
 		printUsage()
@@ -22,6 +24,8 @@ func main() {
 		cmdList(claudeDir, os.Args[2:])
 	case "export":
 		cmdExport(claudeDir, os.Args[2:])
+	case "version", "--version":
+		fmt.Println(version)
 	case "help", "--help", "-h":
 		printUsage()
 	default:
